@@ -20,7 +20,7 @@ public class Tarea {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	
 	
 	@Column(nullable = false, length = 200)
@@ -49,7 +49,7 @@ public class Tarea {
 		super();
 	}
 
-	public Tarea(int id, String descripcion, LocalDate fechalimite, double costoEstimado, Proyecto proyecto,
+	public Tarea(Integer id, String descripcion, LocalDate fechalimite, double costoEstimado, Proyecto proyecto,
 			List<Empleado> empleados) {
 		super();
 		this.id = id;
