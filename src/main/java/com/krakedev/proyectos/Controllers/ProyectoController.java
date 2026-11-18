@@ -2,6 +2,7 @@ package com.krakedev.proyectos.Controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,8 @@ public class ProyectoController {
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasRole('ADMIN')")
+
 	public ResponseEntity<?> guardar(@RequestBody Proyecto proyecto){
 	Proyecto proyectoGuardado;
 	try {
@@ -37,6 +40,7 @@ public class ProyectoController {
 	}
 	
 	@GetMapping
+	@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 	public ResponseEntity<?> listar(){
 		try {
 			return ResponseEntity.ok(service.listar());
@@ -77,6 +81,7 @@ public class ProyectoController {
 	}
 	
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 	public ResponseEntity<?> eliminar (@PathVariable int id){
 		boolean eliminado;
 		try {

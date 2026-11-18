@@ -2,13 +2,18 @@ package com.krakedev.proyectos.security;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.auth0.jwt.JWT;
+import com.krakedev.proyectos.entidades.Usuario;
+import com.krakedev.proyectos.repositories.UsuarioRepository;
 import com.krakedev.proyectos.services.TokenBlacklistService;
 
 import jakarta.servlet.FilterChain;
@@ -24,6 +29,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
 
+	@Autowired
+	private UsuarioRepository usuarioRepository;
+	
 	public JwtAuthenticationFilter(TokenBlacklistService tokenBlackListService, JwtUtil jwtUtil) {
 		this.tokenBlackListService = tokenBlackListService;
 		this.jwtUtil = jwtUtil;
@@ -55,10 +63,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		String username = JWT.decode(token).getSubject();
 
-		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null,
-				new ArrayList<>());
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+		Usuario usuario = usuarioRepository.findByUsername(username).orElse(null);
 
+		if (usuario != null) {
+		    String rol = usuario.getRol();
+
+		    UsernamePasswordAuthenticationToken authentication =
+		        new UsernamePasswordAuthenticationToken(
+		            username,
+		            null,
+		            List.of(new SimpleGrantedAuthority("ROLE_" + rol))
+		        );
+
+		    SecurityContextHolder.getContext().setAuthentication(authentication);
+		}
 		filterChain.doFilter(request, response);
 	}
 
